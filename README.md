@@ -194,4 +194,4 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## License
 
-UNLICENSED - Private package.
+[MIT](LICENSE)
