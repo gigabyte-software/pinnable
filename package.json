@@ -1,0 +1,36 @@
+{
+  "name": "@gigabyte/pinnable",
+  "version": "0.1.0",
+  "description": "Interactive canvas-based pin-on-image component for floor plans and similar use cases",
+  "type": "module",
+  "main": "dist/pinnable.umd.js",
+  "module": "dist/pinnable.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/pinnable.es.js",
+      "require": "./dist/pinnable.umd.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite serve sample",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "canvas",
+    "pin",
+    "floorplan",
+    "image",
+    "interactive",
+    "zoom",
+    "pan"
+  ],
+  "license": "UNLICENSED",
+  "private": true,
+  "devDependencies": {
+    "vite": "^8.0.5"
+  }
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pinnable Component - Demo</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+</head>
+<body>
+  <div class="demo-app">
+    <header class="demo-header">
+      <h1>Pinnable</h1>
+      <p class="demo-subtitle">Long-press the image to place pins. Tap a pin to edit it. Drag labels to reposition them.</p>
+    </header>
+
+    <div class="demo-toolbar">
+      <div class="demo-toolbar-group">
+        <label class="demo-file-label">
+          <input type="file" id="imageInput" accept="image/*" hidden>
+          Load Image
+        </label>
+        <button id="btnLoadJson" title="Load from JSON">Load JSON</button>
+      </div>
+      <div class="demo-toolbar-group">
+        <button id="btnZoomIn" title="Zoom in">+</button>
+        <button id="btnZoomOut" title="Zoom out">&minus;</button>
+        <button id="btnResetView" title="Reset view">&squf;</button>
+      </div>
+      <div class="demo-toolbar-group">
+        <button id="btnSave" class="demo-btn-primary">Save</button>
+        <button id="btnExport" title="Export image with pins">Export Image</button>
+        <button id="btnClear" class="demo-btn-danger">Clear Data</button>
+      </div>
+    </div>
+
+    <div id="pinnableContainer" class="demo-canvas-container">
+      <div class="demo-placeholder" id="placeholder">
+        <p>Load an image to get started</p>
+      </div>
+    </div>
+
+    <div class="demo-data-panel">
+      <div class="demo-data-header">
+        <span>Data Output</span>
+        <button id="btnToggleData" class="demo-btn-small">Show/Hide</button>
+      </div>
+      <pre id="dataOutput" class="demo-data-output"></pre>
+    </div>
+  </div>
+
+  <dialog id="jsonDialog" class="demo-dialog">
+    <h3>Load JSON Data</h3>
+    <textarea id="jsonInput" rows="12" placeholder='{"image":{"src":"..."},"pins":[...]}'></textarea>
+    <div class="demo-dialog-actions">
+      <button id="btnJsonCancel">Cancel</button>
+      <button id="btnJsonLoad" class="demo-btn-primary">Load</button>
+    </div>
+  </dialog>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
