@@ -1,6 +1,6 @@
 {
   "name": "@gigabyte/pinnable",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Interactive canvas-based pin-on-image component for floor plans and similar use cases",
   "type": "module",
   "main": "dist/pinnable.umd.js",

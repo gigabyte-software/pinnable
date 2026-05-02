@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.3.1] - 2026-05-02
+
+### Fixed
+- Selection ring now appears on the tapped or newly placed pin even when `showEditorOnAdd` / `showEditorOnSelect` is `false`, so the host always has visual feedback for which pin is active
+
 ## [0.3.0] - 2026-05-02
 
 ### Added

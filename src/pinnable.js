@@ -311,11 +311,13 @@ export class Pinnable {
       icon: this.options.defaultIcon,
     });
     this.pins.push(pin);
+    this.selectedPinId = pin.id;
 
     if (this.options.showEditorOnAdd) {
-      this.selectedPinId = pin.id;
       const screenPos = this.transform.normalizedToScreen(pin.x, pin.y);
       this.popover.show(pin, screenPos.x, screenPos.y);
+    } else if (this.popover.isVisible()) {
+      this.popover.hide();
     }
 
     this._dispatchEvent('pinnable:pin-add', { pin: { ...pin } });
@@ -376,10 +378,13 @@ export class Pinnable {
     const pin = this.pins.find((p) => p.id === pinId);
     if (!pin) return;
 
+    this.selectedPinId = pinId;
+
     if (this.options.showEditorOnSelect) {
-      this.selectedPinId = pinId;
       const screenPos = this.transform.normalizedToScreen(pin.x, pin.y);
       this.popover.show(pin, screenPos.x, screenPos.y);
+    } else if (this.popover.isVisible()) {
+      this.popover.hide();
     }
 
     this._dispatchEvent('pinnable:pin-selected', { pin: { ...pin } });
