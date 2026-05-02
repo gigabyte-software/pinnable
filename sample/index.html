@@ -27,6 +27,16 @@
         <button id="btnZoomOut" title="Zoom out">&minus;</button>
         <button id="btnResetView" title="Reset view">&squf;</button>
       </div>
+      <div class="demo-toolbar-group demo-toolbar-toggles">
+        <label class="demo-toggle">
+          <input type="checkbox" id="optAutoOpenAdd" checked>
+          Auto-edit on add
+        </label>
+        <label class="demo-toggle">
+          <input type="checkbox" id="optAutoOpenSelect" checked>
+          Auto-edit on select
+        </label>
+      </div>
       <div class="demo-toolbar-group">
         <button id="btnSave" class="demo-btn-primary">Save</button>
         <button id="btnExport" title="Export image with pins">Export Image</button>
@@ -40,12 +50,21 @@
       </div>
     </div>
 
-    <div class="demo-data-panel">
-      <div class="demo-data-header">
-        <span>Data Output</span>
-        <button id="btnToggleData" class="demo-btn-small">Show/Hide</button>
+    <div class="demo-bottom-row">
+      <div class="demo-data-panel">
+        <div class="demo-data-header">
+          <span>Data Output</span>
+          <button id="btnToggleData" class="demo-btn-small">Show/Hide</button>
+        </div>
+        <pre id="dataOutput" class="demo-data-output"></pre>
       </div>
-      <pre id="dataOutput" class="demo-data-output"></pre>
+      <div class="demo-event-log-panel">
+        <div class="demo-data-header">
+          <span>Events</span>
+          <button id="btnClearEvents" class="demo-btn-small">Clear</button>
+        </div>
+        <ul id="eventLog" class="demo-event-log" aria-live="polite"></ul>
+      </div>
     </div>
   </div>
 

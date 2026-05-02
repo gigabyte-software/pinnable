@@ -107,12 +107,21 @@ body {
   font-size: 15px;
 }
 
-.demo-data-panel {
+.demo-bottom-row {
+  display: flex;
+  gap: 8px;
   flex-shrink: 0;
+  min-height: 0;
+}
+
+.demo-data-panel,
+.demo-event-log-panel {
+  flex: 1 1 0;
+  min-width: 0;
   max-height: 200px;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .demo-data-header {
@@ -211,6 +220,78 @@ body {
   transform: translateX(-50%) translateY(0);
 }
 
+.demo-toolbar-toggles {
+  gap: 12px;
+  padding: 0 6px;
+  border-left: 1px solid #d0d0d0;
+  border-right: 1px solid #d0d0d0;
+}
+
+.demo-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #444;
+  cursor: pointer;
+  user-select: none;
+}
+
+.demo-toggle input {
+  cursor: pointer;
+}
+
+.demo-event-log {
+  flex: 1;
+  list-style: none;
+  margin: 0;
+  padding: 6px 8px;
+  overflow-y: auto;
+  background: #1e1e2e;
+  border-radius: 6px;
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 11px;
+  color: #cdd6f4;
+}
+
+.demo-event-log li {
+  padding: 2px 0;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.demo-event-log li:last-child {
+  border-bottom: none;
+}
+
+.demo-event-time {
+  color: #6c7086;
+  flex-shrink: 0;
+}
+
+.demo-event-name {
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.demo-event-detail {
+  color: #a6adc8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.demo-event-name-load { color: #89b4fa; }
+.demo-event-name-save { color: #94e2d5; }
+.demo-event-name-add { color: #a6e3a1; }
+.demo-event-name-remove { color: #f38ba8; }
+.demo-event-name-update { color: #f9e2af; }
+.demo-event-name-selected { color: #cba6f7; }
+
 @media (max-width: 600px) {
   .demo-app {
     padding: 8px;
@@ -228,5 +309,9 @@ body {
   .demo-file-label {
     padding: 4px 8px;
     font-size: 12px;
+  }
+
+  .demo-bottom-row {
+    flex-direction: column;
   }
 }
