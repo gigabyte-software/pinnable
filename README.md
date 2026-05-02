@@ -17,6 +17,7 @@ Zero dependencies. Works with any framework or vanilla JS.
 - High-DPI / Retina display support
 - Gesture locking (pinch and pan don't interfere with each other)
 - Haptic feedback on pin placement (supported devices)
+- Optional host-driven editing (suppress the built-in editor and react via events)
 
 ## Installation
 
@@ -63,6 +64,8 @@ const pinnable = new Pinnable(containerElement, options);
 | `availableColors` | `string[]` | 8 preset colors | Color swatches shown in the pin editor |
 | `availableIcons` | `string[]` | `[]` (all shown) | Icon ID whitelist. Empty = show all built-in icons |
 | `customIcons` | `object[]` | `[]` | Custom image icons (see below) |
+| `showEditorOnAdd` | `boolean` | `true` | Whether the built-in editor opens automatically when a pin is placed |
+| `showEditorOnSelect` | `boolean` | `true` | Whether the built-in editor opens automatically when an existing pin is clicked/tapped |
 
 ### Methods
 
@@ -104,6 +107,32 @@ const blob = await pinnable.exportImage({
 
 Programmatic zoom and view reset.
 
+#### `openEditor(pinId): void`
+
+Opens the built-in pin editor for the given pin. No-op if `pinId` is unknown. Useful when `showEditorOnAdd` / `showEditorOnSelect` are `false` and you want to fall back to the built-in dialog from your own UI.
+
+#### `closeEditor(): void`
+
+Hides the built-in pin editor and clears the current selection.
+
+#### `updatePin(pinId, changes): object | null`
+
+Partial update of a pin's editable fields. Allowed keys: `label`, `labelVisible`, `showConnector`, `color`, `icon` (the same fields the built-in dialog can change). Other keys are ignored.
+
+- Dispatches `pinnable:pin-update` once if anything actually changed.
+- Refreshes the built-in editor if it's currently open for this pin.
+- Returns the updated pin (shallow copy) or `null` if `pinId` is unknown.
+
+```js
+pinnable.updatePin(pin.id, { label: 'Fire exit', color: '#e53935' });
+```
+
+For position / label-offset changes, use drag interactions — those are intentionally outside this API.
+
+#### `removePin(pinId): boolean`
+
+Removes a pin (mirrors the built-in editor's Delete button). Closes the editor if it was open for this pin. Dispatches `pinnable:pin-remove`. Returns `true` on success, `false` if `pinId` is unknown.
+
 #### `destroy()`
 
 Remove all DOM elements, event listeners, and observers. Call when unmounting.
@@ -126,6 +155,25 @@ container.addEventListener('pinnable:save', (e) => {
 | `pinnable:pin-remove` | `{ pin }` | Pin deleted |
 | `pinnable:pin-update` | `{ pin }` | Pin edited (label, color, icon, position, toggles) |
 | `pinnable:pin-selected` | `{ pin }` | Existing pin selected (clicked/tapped) |
+
+### Host-driven editing
+
+Set `showEditorOnAdd` and/or `showEditorOnSelect` to `false` to suppress the built-in editor dialog. The corresponding events still fire, so a host app can render its own UI and use `updatePin` / `removePin` / `openEditor` to drive changes:
+
+```js
+const pinnable = new Pinnable(container, {
+  showEditorOnAdd: false,
+  showEditorOnSelect: false,
+});
+
+container.addEventListener('pinnable:pin-selected', (e) => {
+  myCustomUi.open(e.detail.pin, {
+    onSave: (changes) => pinnable.updatePin(e.detail.pin.id, changes),
+    onDelete: () => pinnable.removePin(e.detail.pin.id),
+    onFallback: () => pinnable.openEditor(e.detail.pin.id),
+  });
+});
+```
 
 ### Pin Data Structure
 
@@ -174,6 +222,8 @@ Built-in icon IDs: `circle`, `pushpin`, `round-pushpin`, `fire-extinguisher`, `d
 Pin placement uses a two-phase long press: a 1-second grace period (no visual feedback, allows scroll/pan to start) followed by a 0.75-second radial progress ring. This prevents accidental pin placement during navigation.
 
 Gesture locking prevents pinch-to-zoom from triggering a pan when one finger lifts first, and vice versa. All fingers must be lifted between gesture types.
+
+The built-in editor can be suppressed entirely with `showEditorOnAdd` / `showEditorOnSelect`. In that mode, listen for `pinnable:pin-add` / `pinnable:pin-selected` and use `updatePin` / `removePin` / `openEditor` to drive editing yourself — see [Host-driven editing](#host-driven-editing).
 
 ## Development
 

@@ -12,6 +12,8 @@ const DEFAULT_COLORS = [
   '#8e24aa', '#00acc1', '#6d4c41', '#546e7a',
 ];
 
+const EDITABLE_FIELDS = ['label', 'labelVisible', 'showConnector', 'color', 'icon'];
+
 export class Pinnable {
   constructor(container, options = {}) {
     this.container = container;
@@ -20,6 +22,8 @@ export class Pinnable {
       availableIcons: options.availableIcons ?? [],
       availableColors: options.availableColors ?? DEFAULT_COLORS,
       customIcons: options.customIcons ?? [],
+      showEditorOnAdd: options.showEditorOnAdd ?? true,
+      showEditorOnSelect: options.showEditorOnSelect ?? true,
     };
 
     injectStyles();
@@ -229,6 +233,59 @@ export class Pinnable {
     this._render();
   }
 
+  openEditor(pinId) {
+    const pin = this.pins.find((p) => p.id === pinId);
+    if (!pin) return;
+    this.selectedPinId = pin.id;
+    const screenPos = this.transform.normalizedToScreen(pin.x, pin.y);
+    this.popover.show(pin, screenPos.x, screenPos.y);
+    this._render();
+  }
+
+  closeEditor() {
+    if (this.popover.isVisible()) this.popover.hide();
+    if (this.selectedPinId !== null) {
+      this.selectedPinId = null;
+      this._render();
+    }
+  }
+
+  updatePin(pinId, changes) {
+    const pin = this.pins.find((p) => p.id === pinId);
+    if (!pin || !changes) return null;
+
+    let mutated = false;
+    for (const key of EDITABLE_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(changes, key) && pin[key] !== changes[key]) {
+        pin[key] = changes[key];
+        mutated = true;
+      }
+    }
+    if (!mutated) return { ...pin };
+
+    if (this.popover.isVisible() && this.selectedPinId === pinId) {
+      const screenPos = this.transform.normalizedToScreen(pin.x, pin.y);
+      this.popover.show(pin, screenPos.x, screenPos.y);
+    }
+
+    this._dispatchEvent('pinnable:pin-update', { pin: { ...pin } });
+    this._render();
+    return { ...pin };
+  }
+
+  removePin(pinId) {
+    const idx = this.pins.findIndex((p) => p.id === pinId);
+    if (idx === -1) return false;
+    const removed = this.pins.splice(idx, 1)[0];
+    if (this.selectedPinId === pinId) {
+      if (this.popover.isVisible()) this.popover.hide();
+      this.selectedPinId = null;
+    }
+    this._dispatchEvent('pinnable:pin-remove', { pin: { ...removed } });
+    this._render();
+    return true;
+  }
+
   _handleZoom(sx, sy, factor) {
     this.transform.zoomAt(sx, sy, factor);
     this._updatePopoverPosition();
@@ -254,19 +311,24 @@ export class Pinnable {
       icon: this.options.defaultIcon,
     });
     this.pins.push(pin);
-    this.selectedPinId = pin.id;
 
-    const screenPos = this.transform.normalizedToScreen(pin.x, pin.y);
-    this.popover.show(pin, screenPos.x, screenPos.y);
+    if (this.options.showEditorOnAdd) {
+      this.selectedPinId = pin.id;
+      const screenPos = this.transform.normalizedToScreen(pin.x, pin.y);
+      this.popover.show(pin, screenPos.x, screenPos.y);
+    }
 
     this._dispatchEvent('pinnable:pin-add', { pin: { ...pin } });
     this._render();
   }
 
-  _handleEmptyTap(screenX, screenY) {
-    if (this.popover.isVisible()) {
-      this.popover.hide();
+  _handleEmptyTap() {
+    const wasVisible = this.popover.isVisible();
+    if (wasVisible) this.popover.hide();
+    if (this.selectedPinId !== null) {
       this.selectedPinId = null;
+      this._render();
+    } else if (wasVisible) {
       this._render();
     }
   }
@@ -311,13 +373,16 @@ export class Pinnable {
   }
 
   _handlePinSelect(pinId) {
-    this.selectedPinId = pinId;
     const pin = this.pins.find((p) => p.id === pinId);
-    if (pin) {
+    if (!pin) return;
+
+    if (this.options.showEditorOnSelect) {
+      this.selectedPinId = pinId;
       const screenPos = this.transform.normalizedToScreen(pin.x, pin.y);
       this.popover.show(pin, screenPos.x, screenPos.y);
-      this._dispatchEvent('pinnable:pin-selected', { pin: { ...pin } });
     }
+
+    this._dispatchEvent('pinnable:pin-selected', { pin: { ...pin } });
     this._render();
   }
 
@@ -388,12 +453,7 @@ export class Pinnable {
   }
 
   _handleDelete(pinId) {
-    const idx = this.pins.findIndex((p) => p.id === pinId);
-    if (idx === -1) return;
-    const removed = this.pins.splice(idx, 1)[0];
-    this.selectedPinId = null;
-    this._dispatchEvent('pinnable:pin-remove', { pin: { ...removed } });
-    this._render();
+    this.removePin(pinId);
   }
 
   _hitTest(screenX, screenY) {
