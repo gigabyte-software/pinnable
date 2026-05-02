@@ -125,6 +125,7 @@ container.addEventListener('pinnable:save', (e) => {
 | `pinnable:pin-add` | `{ pin }` | Pin placed |
 | `pinnable:pin-remove` | `{ pin }` | Pin deleted |
 | `pinnable:pin-update` | `{ pin }` | Pin edited (label, color, icon, position, toggles) |
+| `pinnable:pin-selected` | `{ pin }` | Existing pin selected (clicked/tapped) |
 
 ### Pin Data Structure
 

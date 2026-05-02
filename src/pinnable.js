@@ -316,6 +316,7 @@ export class Pinnable {
     if (pin) {
       const screenPos = this.transform.normalizedToScreen(pin.x, pin.y);
       this.popover.show(pin, screenPos.x, screenPos.y);
+      this._dispatchEvent('pinnable:pin-selected', { pin: { ...pin } });
     }
     this._render();
   }
