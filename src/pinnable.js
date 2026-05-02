@@ -250,6 +250,22 @@ export class Pinnable {
     }
   }
 
+  // Programmatically set (or clear) the canvas selection ring. Unlike
+  // `openEditor`, this never shows the built-in editor popover — it just
+  // updates which pin renders with the selection ring. Pass `null` to
+  // clear. No event is dispatched: the caller is the one driving the
+  // selection, so re-emitting `pinnable:pin-selected` would create a
+  // feedback loop in host apps that listen for it.
+  selectPin(pinId) {
+    if (pinId !== null) {
+      const pin = this.pins.find((p) => p.id === pinId);
+      if (!pin) return;
+    }
+    if (this.popover.isVisible()) this.popover.hide();
+    this.selectedPinId = pinId;
+    this._render();
+  }
+
   updatePin(pinId, changes) {
     const pin = this.pins.find((p) => p.id === pinId);
     if (!pin || !changes) return null;

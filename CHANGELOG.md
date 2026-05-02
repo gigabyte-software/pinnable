@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.3.2] - 2026-05-02
+
+### Added
+- `selectPin(pinId)` method to programmatically set (or clear with `null`) the canvas selection ring without opening the built-in editor. Lets a host UI drive selection — e.g. prev/next defect navigation — and have the canvas reflect it visually. No event is dispatched (the caller already knows what it selected) so it won't loop with `pinnable:pin-selected` listeners.
+
 ## [0.3.1] - 2026-05-02
 
 ### Fixed

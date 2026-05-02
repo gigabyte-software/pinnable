@@ -115,6 +115,10 @@ Opens the built-in pin editor for the given pin. No-op if `pinId` is unknown. Us
 
 Hides the built-in pin editor and clears the current selection.
 
+#### `selectPin(pinId | null): void`
+
+Programmatically sets (or clears, with `null`) the canvas selection ring **without** opening the built-in editor. Useful when the host is driving selection — e.g. prev/next navigation between pins from your own UI — and you want the canvas to visually reflect which pin is active. No-op if `pinId` is unknown. No event is dispatched: the caller is the one driving the selection, so `pinnable:pin-selected` is intentionally not re-emitted (which would loop on host listeners).
+
 #### `updatePin(pinId, changes): object | null`
 
 Partial update of a pin's editable fields. Allowed keys: `label`, `labelVisible`, `showConnector`, `color`, `icon` (the same fields the built-in dialog can change). Other keys are ignored.
