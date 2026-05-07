@@ -8,6 +8,7 @@ const PIN_DEFAULTS = {
   showConnector: true,
   color: '#e53935',
   icon: null,
+  markerStyle: null,
 };
 
 export function createPin(x, y, defaults = {}) {

@@ -15,6 +15,12 @@ const CONNECTOR_DASH = [4, 3];
 const SELECTION_RING_RADIUS = 14;
 const SELECTION_RING_WIDTH = 2;
 
+export const MAP_PIN_RADIUS = 12;
+export const MAP_PIN_TAIL_HEIGHT = 10;
+const MAP_PIN_ICON_SIZE = 14;
+const MAP_PIN_BORDER_WIDTH = 2;
+const MAP_PIN_SELECTION_RING_RADIUS = 18;
+
 export class Renderer {
   constructor(canvas) {
     this.canvas = canvas;
@@ -75,6 +81,10 @@ export class Renderer {
   }
 
   _drawPinMarker(x, y, pin, isSelected, sizeScale = 1) {
+    if (pin.markerStyle === 'map-pin') {
+      return this._drawMapPin(x, y, pin, isSelected, sizeScale);
+    }
+
     const ctx = this.ctx;
     const color = pin.color || '#e53935';
     const icon = pin.icon;
@@ -107,6 +117,65 @@ export class Renderer {
       ctx.textBaseline = 'middle';
       ctx.fillText(icon, x, y);
     }
+  }
+
+  _drawMapPin(x, y, pin, isSelected, sizeScale = 1) {
+    const ctx = this.ctx;
+    const color = pin.color || '#e53935';
+    const r = MAP_PIN_RADIUS * sizeScale;
+    const tailH = MAP_PIN_TAIL_HEIGHT * sizeScale;
+    const borderW = MAP_PIN_BORDER_WIDTH * sizeScale;
+
+    // (x, y) is the tip of the tail — the actual floor-plan location.
+    // The circle centre sits above the tip.
+    const cx = x;
+    const cy = y - tailH - r;
+
+    // Selection ring wraps the circle portion
+    if (isSelected) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, MAP_PIN_SELECTION_RING_RADIUS * sizeScale, 0, Math.PI * 2);
+      ctx.strokeStyle = PIN_SELECTED_COLOR;
+      ctx.lineWidth = SELECTION_RING_WIDTH * sizeScale;
+      ctx.stroke();
+    }
+
+    // Draw teardrop: circle + triangular tail
+    ctx.beginPath();
+    const tailAngle = Math.asin(Math.min(1, (r * 0.4) / r));
+    const startAngle = Math.PI / 2 + tailAngle;
+    const endAngle = Math.PI / 2 - tailAngle + Math.PI * 2;
+    ctx.arc(cx, cy, r, startAngle, endAngle);
+    ctx.lineTo(x, y);
+    ctx.closePath();
+
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.lineWidth = borderW;
+    ctx.strokeStyle = PIN_BORDER_COLOR;
+    ctx.stroke();
+
+    // Draw icon inside the circle (white tinted)
+    if (pin.icon && this.customIconMap.has(pin.icon)) {
+      const img = this.customIconMap.get(pin.icon);
+      const iconSize = MAP_PIN_ICON_SIZE * sizeScale;
+      this._drawTintedIcon(img, cx, cy, iconSize, '#ffffff');
+    }
+  }
+
+  _drawTintedIcon(img, cx, cy, size, tintColor) {
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width = size;
+    offCanvas.height = size;
+    const offCtx = offCanvas.getContext('2d');
+
+    offCtx.drawImage(img, 0, 0, size, size);
+
+    offCtx.globalCompositeOperation = 'source-in';
+    offCtx.fillStyle = tintColor;
+    offCtx.fillRect(0, 0, size, size);
+
+    this.ctx.drawImage(offCanvas, cx - size / 2, cy - size / 2, size, size);
   }
 
   _drawLabel(x, y, text, sizeScale = 1) {

@@ -1,5 +1,5 @@
 import { ViewTransform } from './transform.js';
-import { Renderer } from './renderer.js';
+import { Renderer, MAP_PIN_RADIUS, MAP_PIN_TAIL_HEIGHT } from './renderer.js';
 import { Interaction, LONG_PRESS_DURATION } from './interaction.js';
 import { Popover } from './popover.js';
 import { createPin, ensurePinDefaults } from './pin.js';
@@ -12,13 +12,14 @@ const DEFAULT_COLORS = [
   '#8e24aa', '#00acc1', '#6d4c41', '#546e7a',
 ];
 
-const EDITABLE_FIELDS = ['label', 'labelVisible', 'showConnector', 'color', 'icon'];
+const EDITABLE_FIELDS = ['label', 'labelVisible', 'showConnector', 'color', 'icon', 'markerStyle'];
 
 export class Pinnable {
   constructor(container, options = {}) {
     this.container = container;
     this.options = {
       defaultIcon: options.defaultIcon ?? null,
+      defaultMarkerStyle: options.defaultMarkerStyle ?? null,
       availableIcons: options.availableIcons ?? [],
       availableColors: options.availableColors ?? DEFAULT_COLORS,
       customIcons: options.customIcons ?? [],
@@ -325,6 +326,7 @@ export class Pinnable {
     const pin = createPin(norm.x, norm.y, {
       color: this.options.availableColors[0] || '#e53935',
       icon: this.options.defaultIcon,
+      markerStyle: this.options.defaultMarkerStyle,
     });
     this.pins.push(pin);
     this.selectedPinId = pin.id;
@@ -500,9 +502,20 @@ export class Pinnable {
 
     for (const pin of this.pins) {
       const screen = this.transform.normalizedToScreen(pin.x, pin.y);
-      const dist = Math.hypot(screen.x - screenX, screen.y - screenY);
-      if (dist <= HIT_RADIUS) {
-        return { type: 'pin', pin };
+
+      if (pin.markerStyle === 'map-pin') {
+        // Hit area is the circle portion, centred above the tail tip
+        const cx = screen.x;
+        const cy = screen.y - MAP_PIN_TAIL_HEIGHT - MAP_PIN_RADIUS;
+        const dist = Math.hypot(cx - screenX, cy - screenY);
+        if (dist <= MAP_PIN_RADIUS + 4) {
+          return { type: 'pin', pin };
+        }
+      } else {
+        const dist = Math.hypot(screen.x - screenX, screen.y - screenY);
+        if (dist <= HIT_RADIUS) {
+          return { type: 'pin', pin };
+        }
       }
     }
 
