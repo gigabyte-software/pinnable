@@ -164,16 +164,18 @@ export class Renderer {
   }
 
   _drawTintedIcon(img, cx, cy, size, tintColor) {
+    const d = this.dpr;
+    const px = size * d;
     const offCanvas = document.createElement('canvas');
-    offCanvas.width = size;
-    offCanvas.height = size;
+    offCanvas.width = px;
+    offCanvas.height = px;
     const offCtx = offCanvas.getContext('2d');
 
-    offCtx.drawImage(img, 0, 0, size, size);
+    offCtx.drawImage(img, 0, 0, px, px);
 
     offCtx.globalCompositeOperation = 'source-in';
     offCtx.fillStyle = tintColor;
-    offCtx.fillRect(0, 0, size, size);
+    offCtx.fillRect(0, 0, px, px);
 
     this.ctx.drawImage(offCanvas, cx - size / 2, cy - size / 2, size, size);
   }
